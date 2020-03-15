@@ -1,9 +1,7 @@
 package pkg
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type datatype string
@@ -64,12 +62,23 @@ func init() {
 	uint16cache = cache{typ: u16}
 }
 
+// NextInt returns an int value out of convenience. The QRNG server does not natively support int
+// values, thus all values will be strictly in the uint16 range.
+// An error will return -1 along with the error
+func NextInt() (int, error) {
+	ui, err := NextUint16()
+	if err != nil {
+		return -1, err
+	}
+	return int(ui), nil
+}
+
 // NextUint8 will return the next uint8 number. If the cache is empty, it will repopulate it from
 // the anu.edu servers.
 func NextUint8() (uint8, error) {
 	fmt.Println("getting the next number..")
 	if uint8cache.isEmpty() || uint8cache.isExhausted() {
-		numbers, err := queryApi(u8)
+		numbers, err := queryDefaultSize(u8)
 		if err != nil {
 			return 0, err
 		}
@@ -82,22 +91,11 @@ func NextUint8() (uint8, error) {
 // the anu.edu servers.
 func NextUint16() (uint16, error) {
 	if uint16cache.isEmpty() || uint16cache.isExhausted() {
-		numbers, err := queryApi(u16)
+		numbers, err := queryDefaultSize(u16)
 		if err != nil {
 			return 0, err
 		}
 		uint16cache.reset(numbers)
 	}
 	return uint16(uint16cache.next()), nil
-}
-
-func queryApi(dt datatype) ([]uint, error) {
-	query := fmt.Sprintf("%v?length=%d&type=%v", apibase, 10, dt)
-	response, err := http.Get(query)
-	if err != nil {
-		return nil, err
-	}
-	resp := new(ApiResponse)
-	json.NewDecoder(response.Body).Decode(resp)
-	return resp.Data, nil
 }

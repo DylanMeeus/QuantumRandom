@@ -10,5 +10,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("random number: %v\n", n8)
+	fmt.Printf("random uint8 value: %v\n", n8)
+
+	i, err := pkg.NextInt()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("random int value: %v\n", i)
 }
