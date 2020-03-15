@@ -6,6 +6,11 @@ import (
 
 type datatype string
 
+const (
+	u8  datatype = "uint8"
+	u16 datatype = "uint16"
+)
+
 type cache struct {
 	typ       datatype
 	size      int
@@ -39,17 +44,6 @@ func (c *cache) reset(is []uint) {
 	}
 	c.ptr = 0
 	c.populated = true
-}
-
-const (
-	apibase          = "https://qrng.anu.edu.au/API/jsonI.php"
-	u8      datatype = "uint8"
-	u16     datatype = "uint16"
-)
-
-type ApiResponse struct {
-	Length int    `json:"length"`
-	Data   []uint `json:"data"`
 }
 
 var (

@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+const apibase = "https://qrng.anu.edu.au/API/jsonI.php"
+
+type ApiResponse struct {
+	Length int    `json:"length"`
+	Data   []uint `json:"data"`
+}
+
 // queryDefaultSize will request ten numbers from the API.
 func queryDefaultSize(dt datatype) ([]uint, error) {
 	return queryApi(dt, 10)
