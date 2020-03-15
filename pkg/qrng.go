@@ -10,26 +10,36 @@ type datatype string
 
 type cache struct {
 	typ       datatype
+	size      int
 	ptr       int
-	data      [10]uint
+	data      []uint
 	populated bool
 }
 
-func (c cache) isExhausted() bool {
+// isExhausted is true if all values of the cache have been used
+func (c *cache) isExhausted() bool {
 	return c.ptr == len(c.data)
 }
 
-func (c cache) isEmpty() bool {
+// isEmpty is only true if this cache has not been used before
+func (c *cache) isEmpty() bool {
 	return !c.populated
 }
 
-func (c cache) next() uint {
+// next returns the next number in the cache
+func (c *cache) next() uint {
 	val := c.data[c.ptr]
 	c.ptr++
 	return val
 }
 
-func (c cache) reset(is []uint) {
+// next overrides the curent cache with new values
+func (c *cache) reset(is []uint) {
+	c.data = make([]uint, len(is))
+	for i, v := range is {
+		c.data[i] = v
+	}
+	c.ptr = 0
 }
 
 const (

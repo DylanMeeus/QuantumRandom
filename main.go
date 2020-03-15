@@ -6,7 +6,9 @@ import (
 )
 
 func main() {
-	fmt.Println("vim-go")
-	n8 := pkg.NextUint8()
-	fmt.Sprintf("random number: %v\n", n8)
+	n8, err := pkg.NextUint8()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("random number: %v\n", n8)
 }
