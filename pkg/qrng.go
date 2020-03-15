@@ -8,6 +8,30 @@ import (
 
 type datatype string
 
+type cache struct {
+	typ       datatype
+	ptr       int
+	data      [10]uint
+	populated bool
+}
+
+func (c cache) isExhausted() bool {
+	return c.ptr == len(c.data)
+}
+
+func (c cache) isEmpty() bool {
+	return !c.populated
+}
+
+func (c cache) next() uint {
+	val := c.data[c.ptr]
+	c.ptr++
+	return val
+}
+
+func (c cache) reset(is []uint) {
+}
+
 const (
 	apibase          = "https://qrng.anu.edu.au/API/jsonI.php"
 	u8      datatype = "uint8"
@@ -20,29 +44,35 @@ type ApiResponse struct {
 }
 
 var (
-	int8buffer  []uint8
-	int16buffer []uint16
-	uintbuffer  []uint
+	int8cache  cache
+	int16cache cache
 )
 
-func NextUint8() uint8 {
-	fmt.Println("getting the next number")
-	queryApi(u8)
-	return 0
+func init() {
+	int8cache = cache{typ: u8}
+	int16cache = cache{typ: u16}
 }
 
-func queryApi(t datatype) ([]uint, error) {
-	query := fmt.Sprintf("%v?length=%d&type=%v", apibase, 10, t)
-	fmt.Printf("query: %v\n", query)
+// NextUint8 will return the next uint8 number. If the cache is empty, it will repopulate it from
+// the anu.edu servers.
+func NextUint8() (uint8, error) {
+	if int8cache.isEmpty() || int8cache.isExhausted() {
+		numbers, err := queryApi(u8)
+		if err != nil {
+			return 0, err
+		}
+		int8cache.reset(numbers)
+	}
+	return uint8(int8cache.next()), nil
+}
+
+func queryApi(dt datatype) ([]uint, error) {
+	query := fmt.Sprintf("%v?length=%d&type=%v", apibase, 10, dt)
 	response, err := http.Get(query)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Status code: %v\n", response.StatusCode)
-
 	resp := new(ApiResponse)
-
 	json.NewDecoder(response.Body).Decode(resp)
-	fmt.Printf("decoded: %v\n", resp)
-	return nil, nil
+	return resp.Data, nil
 }
