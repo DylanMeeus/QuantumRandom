@@ -55,27 +55,40 @@ type ApiResponse struct {
 }
 
 var (
-	int8cache  cache
-	int16cache cache
+	uint8cache  cache
+	uint16cache cache
 )
 
 func init() {
-	int8cache = cache{typ: u8}
-	int16cache = cache{typ: u16}
+	uint8cache = cache{typ: u8}
+	uint16cache = cache{typ: u16}
 }
 
 // NextUint8 will return the next uint8 number. If the cache is empty, it will repopulate it from
 // the anu.edu servers.
 func NextUint8() (uint8, error) {
 	fmt.Println("getting the next number..")
-	if int8cache.isEmpty() || int8cache.isExhausted() {
+	if uint8cache.isEmpty() || uint8cache.isExhausted() {
 		numbers, err := queryApi(u8)
 		if err != nil {
 			return 0, err
 		}
-		int8cache.reset(numbers)
+		uint8cache.reset(numbers)
 	}
-	return uint8(int8cache.next()), nil
+	return uint8(uint8cache.next()), nil
+}
+
+// NextUint16 will return the next uint16 number. If the cache is empty, it will repopulate it from
+// the anu.edu servers.
+func NextUint16() (uint16, error) {
+	if uint16cache.isEmpty() || uint16cache.isExhausted() {
+		numbers, err := queryApi(u16)
+		if err != nil {
+			return 0, err
+		}
+		uint16cache.reset(numbers)
+	}
+	return uint16(uint16cache.next()), nil
 }
 
 func queryApi(dt datatype) ([]uint, error) {
