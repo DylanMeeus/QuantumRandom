@@ -40,6 +40,7 @@ func (c *cache) reset(is []uint) {
 		c.data[i] = v
 	}
 	c.ptr = 0
+	c.populated = true
 }
 
 const (
@@ -66,6 +67,7 @@ func init() {
 // NextUint8 will return the next uint8 number. If the cache is empty, it will repopulate it from
 // the anu.edu servers.
 func NextUint8() (uint8, error) {
+	fmt.Println("getting the next number..")
 	if int8cache.isEmpty() || int8cache.isExhausted() {
 		numbers, err := queryApi(u8)
 		if err != nil {
