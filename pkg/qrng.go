@@ -67,6 +67,19 @@ func NextInt() (int, error) {
 	return int(ui), nil
 }
 
+// NextIntN returns a batch of N uncached integers.
+func NextIntN(amount int) ([]int, error) {
+	uis, err := queryApi(u16, amount)
+	if err != nil {
+		return nil, err
+	}
+	is := make([]int, len(uis))
+	for index, v := range uis {
+		is[index] = int(v)
+	}
+	return is, nil
+}
+
 // NextUint8 will return the next uint8 number. If the cache is empty, it will repopulate it from
 // the anu.edu servers.
 func NextUint8() (uint8, error) {
